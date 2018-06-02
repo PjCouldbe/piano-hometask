@@ -11,6 +11,7 @@
         <module>nlp-domain</module>
         <module>nlp-shared</module>
         <module>nlp-processor</module>
+        <module>launcher</module>
     </modules>
     <packaging>pom</packaging>
 
