@@ -1,0 +1,163 @@
+Reasonings by task:
+
+Main goal:
+    state1 -> state2
+
+Possible questions:
+1) Из какого состояния?
+2) В какое состояние?
+3) Где? (локация)
+4) Чем? (инструменты, оборудование)
+5) Когда?
+6) Кто?
+7) В чём? (группа метрик, term)
+8) Перешёл или нет?
+9) Какая манипуляция выполняется над значениями?
+
+Типы манипуляций над данными:
+1) Отбор  (Select-?)
+2) Группировка (сегментация)  (Group)
+3) Фильтрация (Filter)
+4) Аггрегация (Agg-?)
+5) Педжинация (Page)
+
+
+Categories:
+3) Location: PoW (Part of the World), Country, Region, City, Street
+4) Environment: Hardware, OS, Browser, Application
+7) In what: group, metric, term
+9) Select: First, Last, First-N, Last-N
+   Agg:  Max, Min, Count, Sum, Norm, Avg, Grows, Falls
+
+    
+Restrictions (Not to Implement):
+1) Categories are not overlapping within the group.
+2) No exact time calculation for 'Past' period ranges.
+
+
+Examples:
+- Show me number of conversion for Annual term for last month
+    1) -
+    2) -
+    3) _
+    4) _
+    5) [NOW - 1 month, NOW]
+    6) _
+    7) group: conversion
+       metric: conversion
+       term: Annual
+    8) +
+    9) Select-First > Page
+- Show me conversion rate by browser
+    1) -
+    2) -
+    3) _
+    4) browser: x
+    5) _
+    6) _
+    7) group: conversion
+       metric: conversion_rate
+       term: _
+    8) +
+    9) Group
+- How am I performing in Europe?
+    1) _
+    2) _
+    3) PoW: Europe
+    4) 
+    5) 
+    6) I
+    7) 
+    8) 
+    9) 
+- What location has the highest conversion rate?
+    1) _
+    2) _
+    3) location: x    (by each sub?)
+    4) _
+    5) _
+    6) _
+    7) group: conversion
+       metric: conversion_rate
+    8) +
+    9) Agg-Max
+- Is my churn rate improving?   
+    1) _
+    2) _
+    3) _
+    4) _
+    5) _
+    6) _
+    7) group: churn
+       metric: churn_rate 
+    8) +
+    9) Grows
+- Show me conversions for the past week
+    1) _
+    2) _
+    3) _
+    4) _
+    5) [NOW - 2 week, NOW - 1 week]
+    6) _
+    7) group: conversion
+       metric: conversion
+    8) +
+    9) 
+- Show me how many conversions I have had
+    1) _
+    2) _
+    3) _
+    4) _
+    5) _
+    6) _
+    7) group: conversion
+       metric: conversion
+    8) +
+    9) Agg-Count
+- How many cancelled subscriptions do I have?
+    1) _
+    2) _
+    3) _
+    4) _
+    5) _
+    6) _
+    7) group: churn
+       metric: churned
+    8) +
+    9) Count
+- How many subscriptions cancelled last week?
+    1) -
+    2) -
+    3) -
+    4) -
+    5) [NOW - 1 week, NOW]
+    6) -
+    7) group: churn
+       metric: churned
+    8) +
+    9) Count
+- What are the 8 locations with the highest conversion rate?
+    1) _
+    2) _
+    3) location: x
+    4) _
+    5) _
+    6) _
+    7) group: conversion
+       metric: conversion_rate
+    8) +
+    9) First-8 > Max > Group
+- How many cancelled subscriptions does my site had between June, 1 and July, 15?
+    1) _
+    2) _
+    3) _
+    4) Hardware: _
+       OS: _
+       Browser: _
+       Application: site
+    5) [June, 1; July, 15]
+    6) _
+    7) group: churn
+       metric: churned
+    8) +
+    9) Count
