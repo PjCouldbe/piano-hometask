@@ -17,26 +17,34 @@ import static io.piano.nlp.shared.TokenType.*;
 public class Tokenizer {
     public List<Token> getTokens(String text) {
         final String puncts = "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~";
-        final String splitPattern = "(?=\\p{Punct})|\\s+";
+        final String splitPattern = "\\s+|(?=\\p{Punct})|(?<=\\p{Punct})(?=.)";
         final String[] parts = text.split(splitPattern);
 
         List<Token> res = new ArrayList<>(parts.length);
         StringBuilder largeToken = new StringBuilder();
         int quotesStack = 0;
         for (String s : parts) {
+            if (s.isEmpty()) continue;
+
             if ( isQoute(s) ) {
                 if (quotesStack > 0) {
                     quotesStack--;
+                    largeToken.append(s);
                     res.add( new Token(largeToken.toString(), WORD) );
                     largeToken = new StringBuilder();
                 } else {
                     quotesStack++;
                     largeToken = new StringBuilder(s);
                 }
+
+                continue;
             }
 
-            if (quotesStack > 1) {
-                largeToken.append(' ').append(s);
+            if (quotesStack > 0) {
+                if (largeToken.length() > 1) {
+                    largeToken.append(' ');
+                }
+                largeToken.append(s);
             } else {
                 TokenType type;
                 if (puncts.contains(s)) {
@@ -52,6 +60,7 @@ public class Tokenizer {
             }
         }
 
+        res.get(0).makeTextLower();
         return res;
     }
 

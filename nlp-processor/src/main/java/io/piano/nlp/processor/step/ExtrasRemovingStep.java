@@ -33,14 +33,16 @@ public class ExtrasRemovingStep {
         if (t.getType() == NUMBER) return true;
 
         String posTag = t.getPOSTag();
+        String text = t.getText();
         if (posTag == null) return true;
 
+        //noinspection SimplifiableIfStatement
         if (posTag.startsWith("V") && ! posTag.equals("VBG")
-                || posTag.startsWith("W") || posTag.startsWith("PRP")) {
+                || posTag.startsWith("W") && ! text.equals("how")
+                || posTag.startsWith("PRP")) {
             return false;
         }
 
-        String text = t.getText();
         return ! textEqualsToAny(text, "the", "for", "with");
     }
 

@@ -1,9 +1,6 @@
 package io.piano.nlp.domain.participant;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 /**
  * Subject which influence onto conversion event somehow. His role reflected in the qualifier and its id (name) - in string value.
@@ -14,6 +11,7 @@ import lombok.ToString;
 @Setter
 @AllArgsConstructor
 @ToString
+@EqualsAndHashCode
 public class Participant {
     private ParticipantQualifier qualifier;
     private String value;

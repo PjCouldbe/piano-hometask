@@ -1,8 +1,6 @@
 package io.piano.nlp.shared;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 /**
  * Represents the single token in user defined query for conversion.
@@ -11,6 +9,8 @@ import lombok.Setter;
  */
 @Getter
 @AllArgsConstructor
+@EqualsAndHashCode(exclude = "POSTag")
+@ToString
 public class Token {
     private String text;
     private TokenType type;
@@ -20,5 +20,9 @@ public class Token {
     public Token(String text, TokenType type) {
         this.text = text;
         this.type = type;
+    }
+
+    public void makeTextLower() {
+        this.text = text.toLowerCase();
     }
 }

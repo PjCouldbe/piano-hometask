@@ -1,6 +1,7 @@
 package io.piano.nlp.domain.time;
 
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -14,6 +15,7 @@ import java.util.Date;
 @Getter
 @Setter
 @AllArgsConstructor
+@EqualsAndHashCode
 public class TimeRange {
     private Date begin;
     private Date end;

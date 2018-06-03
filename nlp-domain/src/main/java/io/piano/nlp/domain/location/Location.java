@@ -1,9 +1,6 @@
 package io.piano.nlp.domain.location;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 /**
  * Represents a single location by whick the user filters its query
@@ -14,6 +11,7 @@ import lombok.ToString;
 @Setter
 @AllArgsConstructor
 @ToString
+@EqualsAndHashCode
 public class Location {
     private LocationQualifier qualifier;
     private String value;

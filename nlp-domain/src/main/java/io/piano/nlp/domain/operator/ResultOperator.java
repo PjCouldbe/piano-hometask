@@ -1,5 +1,6 @@
 package io.piano.nlp.domain.operator;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 
@@ -14,6 +15,7 @@ import java.util.Optional;
  * Created by Dima on 02.06.2018.
  */
 @ToString
+@EqualsAndHashCode
 public class ResultOperator {
     private static final AttributeToValuesResolver RESOLVER = new AttributeToValuesResolver();
 

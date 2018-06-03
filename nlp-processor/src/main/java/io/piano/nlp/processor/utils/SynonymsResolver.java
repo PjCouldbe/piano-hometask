@@ -1,7 +1,9 @@
 package io.piano.nlp.processor.utils;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Utility class represents synonyms dictionary for synonyms resolving step.
@@ -50,7 +52,8 @@ public class SynonymsResolver {
         synonymsDictionary.put("number of", "<PAGE>");
     }
 
-    public String getDefaultWordBySynonym(String word) {
-        return synonymsDictionary.getOrDefault(word, word);
+    public String getDefaultWordBySynonym(String... words) {
+        String unioned = Arrays.stream(words).collect(Collectors.joining(" "));
+        return synonymsDictionary.getOrDefault(unioned, unioned);
     }
 }

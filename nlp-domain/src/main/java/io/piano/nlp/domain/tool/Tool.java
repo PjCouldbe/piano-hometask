@@ -1,5 +1,6 @@
 package io.piano.nlp.domain.tool;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -14,6 +15,7 @@ import java.util.EnumMap;
 @Getter
 @Setter
 @ToString
+@EqualsAndHashCode
 public class Tool {
     private EnumMap<ToolQualifier, String> attrs;
 
