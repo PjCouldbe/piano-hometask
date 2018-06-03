@@ -30,4 +30,9 @@ public class Tool {
     public ToolQualifier[] getNonNullQualifiers() {
         return attrs.keySet().toArray( new ToolQualifier[0] );
     }
+
+    public Tool add(ToolQualifier qualifier, String toolValue) {
+        this.attrs.put(qualifier, toolValue);
+        return this;
+    }
 }

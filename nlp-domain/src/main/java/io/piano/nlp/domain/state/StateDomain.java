@@ -1,9 +1,6 @@
 package io.piano.nlp.domain.state;
 
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 import org.apache.commons.lang.ArrayUtils;
 
 /**
@@ -14,6 +11,7 @@ import org.apache.commons.lang.ArrayUtils;
 @Getter
 @ToString
 @EqualsAndHashCode
+@AllArgsConstructor
 public class StateDomain {
     private MetricGroup metricGroup;
     private String metric;
