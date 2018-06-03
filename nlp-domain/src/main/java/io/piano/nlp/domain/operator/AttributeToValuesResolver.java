@@ -105,7 +105,7 @@ public class AttributeToValuesResolver {
                 break;
             case "other":
                 values = asList(
-                        "exposures_seen", "session_30_days_prior", "pageviews_30_days_prior"
+                        "exposures_seen", "session_30_days_prior", "pageviews_30_days_prior", "conversion_type"
                 );
                 break;
             default:
