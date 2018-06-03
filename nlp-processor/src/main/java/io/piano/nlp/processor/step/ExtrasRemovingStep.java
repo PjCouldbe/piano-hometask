@@ -3,6 +3,7 @@ package io.piano.nlp.processor.step;
 import io.piano.nlp.shared.Token;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static io.piano.nlp.shared.TokenType.NUMBER;
@@ -31,8 +32,19 @@ public class ExtrasRemovingStep {
 
         if (t.getType() == NUMBER) return true;
 
+        String posTag = t.getPOSTag();
+        if (posTag == null) return true;
 
+        if (posTag.startsWith("V") && ! posTag.equals("VBG")
+                || posTag.startsWith("W") || posTag.startsWith("PRP")) {
+            return false;
+        }
 
-        return true;
+        String text = t.getText();
+        return ! textEqualsToAny(text, "the", "for", "with");
+    }
+
+    private boolean textEqualsToAny(String text, String... args) {
+        return Arrays.asList(args).contains(text);
     }
 }
