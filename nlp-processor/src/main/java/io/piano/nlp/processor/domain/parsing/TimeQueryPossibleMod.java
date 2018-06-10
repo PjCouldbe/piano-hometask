@@ -1,4 +1,4 @@
-package io.piano.nlp.processor.step.utils;
+package io.piano.nlp.processor.domain.parsing;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

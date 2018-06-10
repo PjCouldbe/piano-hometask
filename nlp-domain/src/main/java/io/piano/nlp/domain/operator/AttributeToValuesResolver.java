@@ -10,9 +10,13 @@ import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonList;
 
 /**
  * Utility class that provides possible values sets for specified attributes in result operator descriptions.
@@ -21,6 +25,36 @@ import static java.util.Arrays.asList;
  */
 @SuppressWarnings("WeakerAccess")
 public class AttributeToValuesResolver {
+    @Nonnull
+    public AttrPossibleValues getPossibleAttrs(OperatorType type) {
+        List<String> values;
+
+        switch (type) {
+            case GROUP:
+                values = asList(
+                        "groupQualifier", "groupValue"
+                );
+                break;
+            case AGGREGATE:
+                values = singletonList(
+                        "operator"
+                );
+                break;
+            case SELECT:
+                values = asList(
+                        "take", "skip", "order"
+                );
+                break;
+            case PAGE:
+                values = emptyList();
+                break;
+            default:
+                throw new IllegalArgumentException();
+        }
+
+        return new ListAttrPossibleValues(values);
+    }
+
     @Nullable
     public AttrPossibleValues getPossibleValuesForAttr(@Nonnull String attr, @Nullable String parentAttrValue) {
         List<String> values;
@@ -28,7 +62,7 @@ public class AttributeToValuesResolver {
         switch (attr) {
             case "groupQualifier":
                 values = asList(
-                        "location", "tool", "time", "term", "other"
+                        "location", "tool", "time", "term", "participant", "other"
                 );
                 break;
             case "groupValue":
@@ -113,5 +147,14 @@ public class AttributeToValuesResolver {
         }
 
         return new ListAttrPossibleValues(values);
+    }
+
+    public List<String> getAllPossibleGroupAttrValuesList() {
+        return Stream.of("location", "tool", "time", "term", "participant", "other")
+                .map(this::getForGroupColonParent)
+                .filter(Objects::nonNull)
+                .map(AttrPossibleValues::getValuesList)
+                .flatMap(List::stream)
+                .collect(Collectors.toList());
     }
 }

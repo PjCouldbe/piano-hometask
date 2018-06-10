@@ -14,6 +14,7 @@ import org.apache.commons.lang.ArrayUtils;
 @AllArgsConstructor
 public class StateDomain {
     private MetricGroup metricGroup;
+    @Setter
     private String metric;
     @Setter
     private String term;
@@ -21,6 +22,10 @@ public class StateDomain {
     public StateDomain(MetricGroup metricGroup, String metric) {
         this.metricGroup = metricGroup;
         this.metric = metric;
+    }
+
+    public StateDomain(MetricGroup metricGroup) {
+        this.metricGroup = metricGroup;
     }
 
     private boolean setMetricAndGroup(String metric) {

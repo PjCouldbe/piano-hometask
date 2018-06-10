@@ -1,4 +1,4 @@
-package io.piano.nlp.processor.step.utils;
+package io.piano.nlp.processor.utils;
 
 import io.piano.nlp.domain.ParsedQuery;
 import io.piano.nlp.domain.operator.ResultOperator;

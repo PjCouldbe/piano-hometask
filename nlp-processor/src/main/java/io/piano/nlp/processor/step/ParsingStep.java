@@ -2,7 +2,10 @@ package io.piano.nlp.processor.step;
 
 import io.piano.nlp.domain.ParsedQuery;
 import io.piano.nlp.domain.operator.ResultOperator;
-import io.piano.nlp.processor.step.utils.DefaultTagsResolver;
+import io.piano.nlp.processor.step.parsers.GeneralParser;
+import io.piano.nlp.processor.step.parsers.MetricsParser;
+import io.piano.nlp.processor.step.parsers.TimeParser;
+import io.piano.nlp.processor.utils.DefaultTagsResolver;
 import io.piano.nlp.shared.Token;
 
 import java.util.ArrayList;
@@ -23,7 +26,10 @@ public class ParsingStep {
         ParsedQuery result = new ParsedQuery();
         markedTokens = new BitSet( tokens.size() );
 
-        return null; //TODO
+        detectUnambiguous(result, tokens);
+        new GeneralParser().parse(tokens, markedTokens, result);
+
+        return result;
     }
 
 
@@ -49,43 +55,9 @@ public class ParsingStep {
 
     }
 
-
     private void detectRestOfUnambiguous(ParsedQuery query, List<Token> tokens) {
-        for (int i = 0; i < tokens.size(); i++) {
-            if (markedTokens.get(i) == false) {
-
-            }
-        }
-    }
-
-    /*private int tryInterpretAsCalendarUnit(final String text) {
-        final String lowText = text.toLowerCase();
-        int val = Arrays.stream( Calendar.class.getDeclaredFields() )
-                .peek(f -> f.setAccessible(true))
-                .filter(f -> f.getName().toLowerCase().equals(lowText) )
-                .findFirst()
-                .map(f -> {
-                    try {
-                        return f.get(Calendar.getInstance());
-                    } catch (IllegalAccessException e) {
-                        e.printStackTrace();
-                        return null;
-                    }
-                })
-                .map(o -> (Integer)o)
-                .orElse(-1);
-    }*/
-
-    private String tryExtendWord(String word, int index, List<Token> tokens) {
-        if (index < tokens.size() - 1 && markedTokens.get(index + 1) == false) {
-            return word + ' ' + tokens.get(index + 1).getText();
-        }
-
-        if (index > 0 && markedTokens.get(index - 1) == false) {
-            return tokens.get(index - 1).getText() + ' ' + word;
-        }
-
-        return null;
+        new TimeParser().parseTimeRange(query, tokens, markedTokens);
+        new MetricsParser().parseMetrics(query, tokens, markedTokens);
     }
 
 

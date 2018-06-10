@@ -45,4 +45,8 @@ public class ResultOperatorsDescriptor implements Iterable<ResultOperator> {
     public void addAll(List<ResultOperator> opers) {
         operators.addAll(opers);
     }
+
+    public int opertorsSize() {
+        return operators.size();
+    }
 }

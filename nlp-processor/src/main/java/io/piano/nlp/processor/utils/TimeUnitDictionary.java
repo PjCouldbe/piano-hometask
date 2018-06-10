@@ -1,12 +1,16 @@
-package io.piano.nlp.processor.step.utils;
+package io.piano.nlp.processor.utils;
 
+import java.util.Arrays;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * Dcitionary for predefined time units during parsing and service operations for parsing step.
+ *
  * Created by Dima on 03.06.2018.
  */
-@SuppressWarnings("UnusedAssignment")
+@SuppressWarnings({"UnusedAssignment", "WeakerAccess"})
 public class TimeUnitDictionary {
     private static final Map<String, Integer> timeUnitToIds = new HashMap<>();
 
@@ -58,5 +62,34 @@ public class TimeUnitDictionary {
     public boolean isDayOfWeek(String word) {
         int unitId = timeUnitToIds.get(word);
         return unitId >= timeUnitToIds.get("monday") && unitId <= timeUnitToIds.get("sunday");
+    }
+
+    public int getNumberAsDayOfWeek(String word) {
+        if (! isDayOfWeek(word)) return -1000;
+
+        int unitId = timeUnitToIds.get(word);
+        return unitId - timeUnitToIds.get("monday");
+    }
+
+    public int getNumberAsMonth(String word) {
+        if (! isMonth(word)) return -1000;
+
+        int unitId = timeUnitToIds.get(word);
+        return unitId - timeUnitToIds.get("january");
+    }
+
+    public int generalTimeUnitAsCalendarField(String word) {
+        return Arrays.stream( Calendar.class.getDeclaredFields() )
+                .peek(f -> f.setAccessible(true))
+                .filter(f -> f.getName().toLowerCase().equals(word))
+                .findFirst()
+                .map(f -> {
+                    try {
+                        return (Integer) f.get(Calendar.getInstance());
+                    } catch (IllegalAccessException e) {
+                        throw new IllegalArgumentException(e);
+                    }
+                })
+                .orElseThrow(IllegalArgumentException::new);
     }
 }
