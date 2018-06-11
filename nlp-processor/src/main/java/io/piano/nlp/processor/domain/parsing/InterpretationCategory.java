@@ -49,7 +49,8 @@ public enum InterpretationCategory {
             }
     ),
     FUNCTION(
-            t -> t.getType() == TokenType.NUMBER || new TokenUtils().isAuxiliary(t),
+            t -> t.getType() == TokenType.NUMBER || new TokenUtils().isAuxiliary(t)
+                    || (t.getPOSTag() != null && t.getPOSTag().startsWith("W")),
             t -> t.getText().toLowerCase().equals( t.getText() )
     );
 

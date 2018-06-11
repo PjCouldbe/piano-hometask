@@ -20,10 +20,9 @@ import io.piano.nlp.processor.utils.TokenUtils;
 import io.piano.nlp.shared.Token;
 import io.piano.nlp.shared.TokenType;
 
-import java.util.ArrayList;
-import java.util.BitSet;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+
+import static java.util.Collections.emptyList;
 
 /**
  * Parser of general logic for not-particular cases.
@@ -67,17 +66,20 @@ public class GeneralParser {
                     interpretations.set(ic, inter);
                 }
             }
+
+            res.add(interpretations);
         }
 
         return res;
     }
 
     private Interpretation getInterpretation(InterpretationCategory category, Token t) {
-        String ttext = t.getText();
         final TokenUtils utils = new TokenUtils();
 
-        boolean isLower = ttext.toLowerCase().equals(ttext);
         boolean capitalized = utils.isCapitalized(t);
+        String ttext = capitalized ? t.getText() : utils.normalizeText(t);
+        boolean isLower = ttext.toLowerCase().equals(ttext);
+        AttributeToValuesResolver resolver = new AttributeToValuesResolver();
 
         Interpretation res = new Interpretation(category);
         switch (category) {
@@ -127,16 +129,51 @@ public class GeneralParser {
 
                     res.setSubCategories(subcats);
                     res.setValue(ttext);
-                } else if (utils.isAuxiliary(t)) {
+                } else if (t.getPOSTag() != null && t.getPOSTag().startsWith("W") || utils.isAuxiliary(t)) {
                      subcats.add( OperatorType.GROUP.ordinal() );
                      res.setSubCategories(subcats);
                 } else {
-                    res.setValue(ttext);
+                    subcats.add( OperatorType.GROUP.ordinal() );
+
+                    List<String> groupQualifiers = Optional.ofNullable(
+                                    resolver.getPossibleValuesForAttr("groupQualifier", null))
+                            .map(AttrPossibleValues::getValuesList)
+                            .orElse( emptyList() );
+                    int index = groupQualifiers.indexOf(ttext);
+
+                    if (index == -1) {
+                        for (int i = 0; i < groupQualifiers.size(); i++) {
+                            String q = groupQualifiers.get(i);
+
+                            index = Optional.ofNullable(
+                                            resolver.getPossibleValuesForAttr("groupValue", q))
+                                    .map(AttrPossibleValues::getValuesList)
+                                    .map(lst -> lst.indexOf(ttext))
+                                    .orElse(-1);
+                            if (index != -1) {
+                                subcats.add(i);
+                                res.setValue(ttext);
+                            }
+                        }
+                    } else {
+                        subcats.add(index);
+                        res.setValue( getDefaultValuesForGroupQualifiers(ttext) );
+
+                    }
+
+                    res.setSubCategories(subcats);
                 }
 
                 return res;
             default:
                 return null;
+        }
+    }
+    private String getDefaultValuesForGroupQualifiers(String groupQualifier) {
+        switch (groupQualifier) {
+            case "location": return LocationQualifier.CITY.name().toLowerCase();
+            case "tool" :    return ToolQualifier.BROWSER.name().toLowerCase();
+            default:         return null;
         }
     }
 
@@ -147,19 +184,24 @@ public class GeneralParser {
         outer:
         for (int i = 0; i < nonMarkedTokens.size(); i++) {
             Interpretations prev = interpretationsList.get(i);
+            TIntList indicesForMarking = new TIntArrayList();
+
             for (int j = i + 1; j < nonMarkedTokens.size(); j++) {
                 List<Interpretation> mergedInterpretations = interpretationsList.get(j).merge(prev);
 
                 if (mergedInterpretations.size() == 1) {
                     fillParseQueryObject(mergedInterpretations.get(0), parsedQuery);
+                    indicesForMarking.add(i);
+                    indicesForMarking.add(j);
 
-                    for (int k = i; k <= j; k++) {
+                    for (int k : indicesForMarking.toArray()) {
                         markedTokens.set(indexesFromSource.get(k), true);
                     }
 
                     continue outer;
                 } else if (mergedInterpretations.size() > 1) {
                     prev = new Interpretations(mergedInterpretations);
+                    indicesForMarking.add(j);
                 }
             }
         }
@@ -174,6 +216,7 @@ public class GeneralParser {
                 );
 
                 parsedQuery.addLocation(location);
+                break;
             case TERM:
                 List<StateDomain> stateDomains = parsedQuery.getStateDomains();
                 for (StateDomain st : stateDomains) {
@@ -181,6 +224,7 @@ public class GeneralParser {
                         st.setTerm( interpretation.getValue() );
                     }
                 }
+                break;
             case TOOL:
                 Tool tool = new Tool();
                 tool.add(
@@ -189,6 +233,7 @@ public class GeneralParser {
                 );
 
                 parsedQuery.addTool(tool);
+                break;
             case FUNCTION:
                 int[] subCategories = interpretation.getSubCategories().toArray();
                 AttributeToValuesResolver attributeResolver = new AttributeToValuesResolver();
@@ -207,11 +252,13 @@ public class GeneralParser {
                                         .orElse(null);
 
                         if (groupQualifier != null) {
-                            operator.addValueFor("groupQualifier", groupQualifier);
-                            operator.addValueFor("grouValue", interpretation.getValue());
+                            operator.addValueFor(groupQualifier, "groupQualifier");
+                            operator.addValueFor(interpretation.getValue(), "groupValue");
                         }
+                        break;
                     case AGGREGATE:
-                        operator.addValueFor("operator", interpretation.getValue());
+                        operator.addValueFor(interpretation.getValue(), "operator");
+                        break;
                     case SELECT:
                         String selectAttr =
                                 Optional.of(attributeResolver
@@ -221,11 +268,15 @@ public class GeneralParser {
                                         .orElse(null);
 
                         if (selectAttr != null) {
-                            operator.addValueFor(selectAttr, interpretation.getValue());
+                            operator.addValueFor(interpretation.getValue(), selectAttr);
                         }
+                        break;
                     default:
                         break;
                 }
+
+                parsedQuery.getOperatorsDescriptor().add(operator);
+                break;
             default:
                 throw new RuntimeException();
         }
@@ -240,9 +291,15 @@ public class GeneralParser {
 
         for (int i = 0; i < nonMarkedTokens.size(); i++) {
             int markedTokensIndex = indexesFromSource.get(i);
-            if (markedTokens.get(markedTokensIndex) == false) continue;
+            if (markedTokens.get(markedTokensIndex) == true) continue;
 
-            asIsTokenInterpreter.tryParseAsIs( interpretationsList.get(i), parsedQuery );
+            Interpretations inters = interpretationsList.get(i);
+            Interpretation fullInter = inters.getFull();
+            if (fullInter == null) {
+                asIsTokenInterpreter.tryParseAsIs( interpretationsList.get(i), parsedQuery );
+            } else {
+                fillParseQueryObject(fullInter, parsedQuery);
+            }
             markedTokens.set(markedTokensIndex, true);
         }
     }

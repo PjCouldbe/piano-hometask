@@ -64,7 +64,9 @@ public class AsIsTokenInterpreter {
 
     private WeightedResult callAppropriateHandler(InterpretationCategory category, Interpretation interpretation,
                                                   ParsedQuery parsedQuery) {
+        if (interpretation == null) return null;
         Function<Interpretation, WeightedResult> handler;
+
         switch (category) {
             case LOCATION:
                 handler = handleLocationInterpretation(parsedQuery);
@@ -153,8 +155,8 @@ public class AsIsTokenInterpreter {
                 if (groupValues == null) continue;
 
                 if (groupValues.getValuesList().contains(ttext)) {
-                    oper.addValueFor("groupQualifier", groupQualifier);
-                    oper.addValueFor("groupValue", ttext);
+                    oper.addValueFor(groupQualifier, "groupQualifier");
+                    oper.addValueFor(ttext, "groupValue");
                 }
             }
 

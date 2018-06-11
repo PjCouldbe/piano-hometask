@@ -1,7 +1,6 @@
 package io.piano.nlp.domain.operator;
 
 import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 import javax.annotation.Nonnull;
@@ -17,7 +16,6 @@ import java.util.List;
  */
 @AllArgsConstructor
 @ToString
-@EqualsAndHashCode
 public class ResultOperatorsDescriptor implements Iterable<ResultOperator> {
     private List<ResultOperator> operators;
 
@@ -48,5 +46,21 @@ public class ResultOperatorsDescriptor implements Iterable<ResultOperator> {
 
     public int opertorsSize() {
         return operators.size();
+    }
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        ResultOperatorsDescriptor that = (ResultOperatorsDescriptor) o;
+
+        return getOperatorInExecutionOrder().equals(that.getOperatorInExecutionOrder());
+    }
+
+    @Override
+    public int hashCode() {
+        return getOperatorInExecutionOrder().hashCode();
     }
 }

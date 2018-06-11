@@ -10,7 +10,7 @@ import java.util.Map;
  *
  * Created by Dima on 03.06.2018.
  */
-@SuppressWarnings({"UnusedAssignment", "WeakerAccess"})
+@SuppressWarnings({"UnusedAssignment", "WeakerAccess", "SimplifiableIfStatement"})
 public class TimeUnitDictionary {
     private static final Map<String, Integer> timeUnitToIds = new HashMap<>();
 
@@ -50,17 +50,23 @@ public class TimeUnitDictionary {
     }
 
     public boolean isGeneralTimeUnit(String word) {
-        int unitId = timeUnitToIds.get(word);
+        Integer unitId = timeUnitToIds.get(word);
+        if (unitId == null) return false;
+
         return unitId >= timeUnitToIds.get("year") && unitId <= timeUnitToIds.get("minute");
     }
 
     public boolean isMonth(String word) {
-        int unitId = timeUnitToIds.get(word);
+        Integer unitId = timeUnitToIds.get(word);
+        if (unitId == null) return false;
+
         return unitId >= timeUnitToIds.get("january") && unitId <= timeUnitToIds.get("december");
     }
 
     public boolean isDayOfWeek(String word) {
-        int unitId = timeUnitToIds.get(word);
+        Integer unitId = timeUnitToIds.get(word);
+        if (unitId == null) return false;
+
         return unitId >= timeUnitToIds.get("monday") && unitId <= timeUnitToIds.get("sunday");
     }
 

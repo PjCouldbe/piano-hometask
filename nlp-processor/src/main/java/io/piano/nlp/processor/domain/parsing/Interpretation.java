@@ -16,9 +16,9 @@ import static io.piano.nlp.processor.domain.parsing.InterpretationCategory.TERM;
 @SuppressWarnings("WeakerAccess")
 @Getter
 @Setter
-@Builder
 @EqualsAndHashCode
 @ToString
+@AllArgsConstructor
 public class Interpretation {
     private InterpretationCategory category;
     private TIntList subCategories;
@@ -42,17 +42,36 @@ public class Interpretation {
     }
 
     public boolean conflictsWith(Interpretation other) {
-        return  (subCategories.size() != 0 && subCategories.size() != 0 && other.subCategories != subCategories)
-                ||  ! (isNullOrEmpty(value) || isNullOrEmpty(value) || other.value.equals(value))
-                || ! this.equals(other);
+        return  category != other.category
+                || subCategoriesConflicts(other)
+                || valuesConflicts(other);
     }
-
-    public Interpretation append(Interpretation other) {
-        if (this.subCategories.size() != 0) {
-            this.subCategories = other.subCategories;
+    private boolean subCategoriesConflicts(Interpretation other) {
+        if (subCategories.size() == 0 || other.subCategories.size() == 0
+                || other.subCategories.equals(subCategories) ) {
+            return false;
         }
 
-        if ( isNullOrEmpty(this.value) ) {
+        for (int i = 0; i < Math.min(subCategories.size(), other.subCategories.size()); i++) {
+            if (subCategories.get(i) != other.subCategories.get(i)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+    private boolean valuesConflicts(Interpretation other) {
+        return ! (isNullOrEmpty(value) || isNullOrEmpty(other.value) || other.value.equals(value))
+                && ! (category == TERM && (value.contains("term") || other.value.contains("term")) );
+    }
+
+
+    public Interpretation append(Interpretation other) {
+        this.subCategories = this.subCategories.size() >= other.subCategories.size()
+                ? this.subCategories
+                : other.subCategories;
+
+        if ( isNullOrEmpty(this.value) || (category == TERM && this.value.contains("term")) ) {
             this.value = other.value;
         }
 

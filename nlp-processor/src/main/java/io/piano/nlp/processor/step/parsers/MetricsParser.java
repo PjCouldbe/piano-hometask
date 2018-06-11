@@ -12,7 +12,7 @@ import java.util.BitSet;
 import java.util.List;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
-import static java.util.Arrays.asList;
+import static com.google.common.collect.Lists.newArrayList;
 import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
 
@@ -60,7 +60,7 @@ public class MetricsParser {
     }
 
     private String selectFinalMetric(List<Token> tokens, BitSet markedTokens, int index, String[] metrics) {
-        List<String> filteredMetrics = findMetrics(tokens.get(index), asList(metrics));
+        List<String> filteredMetrics = findMetrics(tokens.get(index), newArrayList(metrics));
         if (filteredMetrics.size() == 1) return filteredMetrics.get(0);
 
         String metricFromRight = tryExpanse(tokens, markedTokens, index, 1, metrics);
@@ -78,7 +78,7 @@ public class MetricsParser {
     private String tryExpanse(List<Token> tokens, BitSet markedTokens, int currIndex, int step, String[] metrics) {
         if (step == 0) return null;
 
-        List<String> metricsList = asList(metrics);
+        List<String> metricsList = newArrayList(metrics);
         for (int i = currIndex + step; (step > 0 ? i < tokens.size() : i >= 0); i += step) {
             if (markedTokens.get(i) == true) continue;
 

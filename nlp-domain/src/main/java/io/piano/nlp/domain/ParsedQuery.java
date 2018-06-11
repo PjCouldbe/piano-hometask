@@ -23,16 +23,21 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@EqualsAndHashCode
+@EqualsAndHashCode(exclude = "timeRange")
 public class ParsedQuery {
     private String fromState;
     private String toState;
-    private List<Location> locations;
-    private List<Tool> tools;
+    @Builder.Default
+    private List<Location> locations = new ArrayList<>();
+    @Builder.Default
+    private List<Tool> tools = new ArrayList<>();
     private TimeRange timeRange;
-    private List<Participant> participants;
-    private List<StateDomain> stateDomains;
-    private ResultOperatorsDescriptor operatorsDescriptor;
+    @Builder.Default
+    private List<Participant> participants = new ArrayList<>();
+    @Builder.Default
+    private List<StateDomain> stateDomains = new ArrayList<>();
+    @Builder.Default
+    private ResultOperatorsDescriptor operatorsDescriptor = new ResultOperatorsDescriptor();
 
     public void addLocation(@Nonnull Location loc) {
         if (locations == null) {

@@ -22,7 +22,7 @@ public class DefaultTagsResolver {
     static {
         final BiConsumer<String, ParsedQuery> addAggregateOperator = (operValue, pq) -> {
             ResultOperator oper = new ResultOperator(AGGREGATE);
-            boolean added = oper.addValueFor("operator", operValue);
+            boolean added = oper.addValueFor(operValue, "operator");
             if (added) {
                 pq.addOperator(oper);
             }

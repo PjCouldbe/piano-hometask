@@ -74,4 +74,8 @@ public class TimeQuerySetting {
 
         return c.getTime();
     }
+
+    public static int getNoValue() {
+        return NO_VALUE;
+    }
 }

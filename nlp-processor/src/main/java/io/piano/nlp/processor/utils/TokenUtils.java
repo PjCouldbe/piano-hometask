@@ -12,12 +12,12 @@ import static java.lang.Character.isUpperCase;
 public class TokenUtils {
     public boolean isAuxiliary(Token t) {
         final String posTag = t.getPOSTag();
-        return ("CC|DT|IN|RP|TO|UH").contains(posTag);
+        return posTag != null && ("CC|DT|IN|RP|TO|UH").contains(posTag);
     }
 
     public String normalizeText(Token t) {
         String tokenText = t.getText();
-        return tokenText.replaceAll("e?s($|\")", "s")
+        return tokenText.replaceAll("e?s($|\")", "")
                 .replaceAll("ies($|\")", "y");
     }
 

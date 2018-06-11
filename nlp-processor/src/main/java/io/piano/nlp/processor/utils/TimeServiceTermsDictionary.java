@@ -65,7 +65,11 @@ public class TimeServiceTermsDictionary {
                 processPastGeneral(ttext, k, markedTokens, begin, end, value, addMod);
             } else if (cat == CONCRETE) {
                 processPastConcrete(ttext, k, dict, markedTokens, begin, end);
+            } else {
+                continue;   //do not mark this token then!
             }
+
+            markedTokens.set(k, true);
         }
     }
 
@@ -82,25 +86,21 @@ public class TimeServiceTermsDictionary {
                 break;
             case "month":
                 begin.setMonthMod(finalValue);
-                begin.setMonthMod(addMod);
+                end.setMonthMod(addMod);
                 break;
             case "week":
                 begin.setWeekMod(finalValue);
-                begin.setWeekMod(addMod);
+                end.setWeekMod(addMod);
                 break;
             case "hour":
                 begin.setHourMod(finalValue);
-                begin.setHourMod(addMod);
+                end.setHourMod(addMod);
                 break;
             case "minute":
                 begin.setMinuteMod(finalValue);
-                begin.setMinuteMod(addMod);
+                end.setMinuteMod(addMod);
                 break;
-            default:
-                return;   //do not mark this token!
         }
-
-        markedTokens.set(index, true);
     }
 
     private void processPastConcrete(String ttext, int index, TimeUnitDictionary dict, BitSet markedTokens,

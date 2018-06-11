@@ -2,7 +2,6 @@ package io.piano.nlp.processor.step.parsers;
 
 import io.piano.nlp.domain.ParsedQuery;
 import io.piano.nlp.domain.time.TimeRange;
-import io.piano.nlp.processor.domain.parsing.TimeQueryPossibleModBuffer;
 import io.piano.nlp.processor.domain.parsing.TimeQuerySetting;
 import io.piano.nlp.processor.domain.parsing.TimeUnitCategory;
 import io.piano.nlp.processor.utils.*;
@@ -10,8 +9,14 @@ import io.piano.nlp.shared.Token;
 import io.piano.nlp.shared.TokenType;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-import java.util.*;
+import javax.annotation.Nullable;
+import java.util.BitSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.ToIntFunction;
 
 import static io.piano.nlp.processor.domain.parsing.TimeUnitCategory.*;
 import static java.lang.Integer.parseInt;
@@ -64,9 +69,12 @@ public class TimeParser {
 
 
     private int findFirstTimeUnit(List<Token> tokens, BitSet markedTokens) {
+        TokenUtils tokenUtils = new TokenUtils();
+
         for (int i = 0; i < tokens.size(); i++) {
             if (markedTokens.get(i) == false) {
-                boolean isTimeUnit = TIME_UNIT_DICTIONARY.isTimeUnit( tokens.get(i).getText() );
+                final String word = tokenUtils.normalizeText(tokens.get(i));
+                boolean isTimeUnit = TIME_UNIT_DICTIONARY.isTimeUnit(word);
                 if (isTimeUnit) {
                     return i;
                 }
@@ -134,7 +142,7 @@ public class TimeParser {
                                          TimeQuerySetting begin, TimeQuerySetting end)
     {
         int fromIndex = timeUnitsRange.fromIndex;
-        for (int i = fromIndex; i <= timeUnitsRange.toIndex; i++) {
+        for (int i = fromIndex; i < timeUnitsRange.toIndex; i++) {
             if (timeUnitsRange.categories[i - fromIndex] == CONCRETIZING_WORD) {
                 TIME_SERVICE_TERMS_DICTIONARY.processConcretizingWord(tokens, i,
                         timeUnitsRange, markedTokens, begin, end);
@@ -145,78 +153,55 @@ public class TimeParser {
     private void processRemainedTimeUnits(List<Token> tokens, TimeUnitsRange timeUnitsRange, BitSet markedTokens,
                                           TimeQuerySetting begin, TimeQuerySetting end) {
         int fromIndex = timeUnitsRange.fromIndex;
-        for (int i = fromIndex; i <= timeUnitsRange.toIndex; i++) {
+        for (int i = fromIndex; i < timeUnitsRange.toIndex; i++) {
             if (markedTokens.get(i) == true) continue;
 
-            //TODO:
+            TimeConcreteModification concreteMod = getTimeEntryModifier( tokens.get(i) );
+            applyTimeConcreteModification(concreteMod, begin, end);
         }
     }
 
 
 
-    private void tryParseAsTime(ParsedQuery query, List<Token> tokens, int index, BitSet markedTokens,
-                                TimeQuerySetting timeQuerySetting, TimeQueryPossibleModBuffer timeModBuffer)
-    {
-        processTimeToken(tokens.get(index), index, markedTokens, timeQuerySetting, timeModBuffer);
-
-        TokenExpansionUtils expansionUtils = new TokenExpansionUtils();
-        final TokenConsumer tokenConsumer = (t, i) -> processTimeToken(t, i, markedTokens, timeQuerySetting, timeModBuffer);
-
-        boolean succeeded = expansionUtils.tryExpanseRight(tokens, index, tokenConsumer);
-        if ( ! succeeded) {
-            expansionUtils.tryExpanseLeft(tokens, index, tokenConsumer);
-        }
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    private static class TimeConcreteModification {
+        private Consumer<TimeQuerySetting> setter = null;
+        private ToIntFunction<TimeQuerySetting> getter = null;
     }
 
-
-    private boolean processTimeToken(Token t, int index, BitSet markedTokens, TimeQuerySetting timeQuerySetting,
-                                     TimeQueryPossibleModBuffer timeModBuffer )
+    @Nullable
+    private TimeConcreteModification getTimeEntryModifier(Token t)
     {
-        final String word = t.getText();
-        if ( t.getType() != TokenType.NUMBER &&  ! TIME_UNIT_DICTIONARY.isTimeUnit(word) ) return false;
-
-        boolean processed = processTimeEntry(t, timeQuerySetting, timeModBuffer);
-        if (processed) {
-            markedTokens.set(index, true);
-        }
-
-        return true;
-    }
-
-    //TODO: by diagem
-    private boolean processTimeEntry(Token t, TimeQuerySetting timeQuerySetting,
-                                     TimeQueryPossibleModBuffer timeModBuffer)
-    {
-        String word = t.getText();
+        String word = new TokenUtils().normalizeText(t).toLowerCase();
+        TimeConcreteModification res = new TimeConcreteModification();
 
         if (t.getType() == TokenType.NUMBER) {
             try {
                 int value = getAsDayOfAsAYear( parseInt(word) );
                 if (value >= 100) {
-                    timeQuerySetting.setYear(value);
+                    res.setGetter(TimeQuerySetting::getYear);
+                    res.setSetter( tset -> tset.setYear(value) );
                 } else {
-                    timeQuerySetting.setDay(value);
+                    res.setGetter(TimeQuerySetting::getDay);
+                    res.setSetter( tset -> tset.setDay(value) );
                 }
             } catch (RuntimeException e) {
                 e.printStackTrace();
-                return false;
+                return null;
             }
         } else if ( TIME_UNIT_DICTIONARY.isDayOfWeek(word) ) {
             int dayOfWeek = TIME_UNIT_DICTIONARY.getNumberAsDayOfWeek(word);
-            timeQuerySetting.setDayOfWeek(dayOfWeek);
+            res.setGetter(TimeQuerySetting::getDayOfWeek);
+            res.setSetter( tset -> tset.setDayOfWeek(dayOfWeek) );
         } else if ( TIME_UNIT_DICTIONARY.isMonth(word) ) {
             int month = TIME_UNIT_DICTIONARY.getNumberAsMonth(word);
-            timeQuerySetting.setMonth(month);
-        } else {   //if ( TIME_UNIT_DICTIONARY.isGeneralTimeUnit(word) )
-            try {
-                timeModBuffer.putNew( TIME_UNIT_DICTIONARY.generalTimeUnitAsCalendarField(word) );
-            } catch (IllegalArgumentException e) {
-                e.printStackTrace();
-                return false;
-            }
+            res.setGetter(TimeQuerySetting::getMonth);
+            res.setSetter( tset -> tset.setMonth(month) );
         }
 
-        return true;
+        return (res.getter == null || res.setter == null) ? null : res;
     }
     private int getAsDayOfAsAYear(int num) {
         return num > 31
@@ -225,6 +210,17 @@ public class TimeParser {
     }
 
 
+    private void applyTimeConcreteModification(@Nullable TimeConcreteModification concreteMod,
+                                               TimeQuerySetting begin, TimeQuerySetting end)
+    {
+        if (concreteMod == null) return;
+
+        if ( concreteMod.getter.applyAsInt(begin) == TimeQuerySetting.getNoValue() ) {
+            concreteMod.setter.accept(begin);
+        } else {
+            concreteMod.setter.accept(end);
+        }
+    }
 
     /*@SuppressWarnings("PointlessBooleanExpression")
     private void tryParseAsTime_Private(ParsedQuery query, List<Token> tokens, int index, BitSet markedTokens) {

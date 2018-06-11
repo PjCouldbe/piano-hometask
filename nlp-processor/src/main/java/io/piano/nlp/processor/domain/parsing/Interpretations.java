@@ -1,5 +1,6 @@
 package io.piano.nlp.processor.domain.parsing;
 
+import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -50,5 +51,16 @@ public class Interpretations {
                 .filter(Interpretation::isFull)
                 .findFirst().map(Collections::singletonList)
                 .orElse(mergedInterpretations);
+    }
+
+    @Nullable
+    public Interpretation getFull() {
+        for (Interpretation inter : interpretations) {
+            if (inter != null && inter.getCategory() != InterpretationCategory.TERM && inter.isFull()) {
+                return inter;
+            }
+        }
+
+        return null;
     }
 }

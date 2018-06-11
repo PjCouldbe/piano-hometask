@@ -23,6 +23,12 @@ public class Tool {
         attrs = new EnumMap<>(ToolQualifier.class);
     }
 
+    public Tool(ToolQualifier q, String value) {
+        this();
+        attrs.put(q, value);
+    }
+
+
     public String get(ToolQualifier qualifier) {
         return attrs.get(qualifier);
     }
