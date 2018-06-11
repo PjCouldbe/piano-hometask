@@ -244,6 +244,8 @@ public class GeneralParser {
 
                 switch (operator.getOperatorType()) {
                     case GROUP:
+                        if (subCategories.length <= 1) break;
+
                         String groupQualifier =
                                 Optional.ofNullable(attributeResolver
                                                 .getPossibleValuesForAttr("groupQualifier", null))
