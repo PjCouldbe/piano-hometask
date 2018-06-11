@@ -5,6 +5,7 @@ import io.piano.nlp.domain.UserDefinedQuery;
 import io.piano.nlp.processor.ParseQueryPipeline;
 
 import java.util.List;
+import java.util.Scanner;
 
 import static java.util.Arrays.asList;
 
@@ -14,16 +15,38 @@ import static java.util.Arrays.asList;
  * Created by Dima on 02.06.2018.
  */
 public class Launcher {
-    public static void main(String[] args) {
+    private static final ParseQueryPipeline pipeline = ParseQueryPipeline.initialize();
 
+    public static void main(String[] args) {
+        new Launcher().run();
     }
 
-    private void parseAndShowOutputs(List<String> userQueriesStrings) {
-        ParseQueryPipeline pipeline = ParseQueryPipeline.initialize();
 
+    private void run() {
+        try (Scanner sc = new Scanner(System.in)) {
+            String input = sc.nextLine();
+
+            while (input != null && ! (input.equals("exit")) ) {
+                if (input.equals("show demo")) {
+                    demoData();
+                } else if ( ! input.isEmpty()) {
+                    parseInput(input);
+                    System.out.println("\n\n");
+                }
+            }
+        }
+    }
+
+    private void parseInput(String query) {
+        ParsedQuery parsedQuery = pipeline.run( new UserDefinedQuery(query) );
+        System.out.println(parsedQuery);
+    }
+
+    private void demoData() {
+        List<String> userQueriesStrings = defineInputs();
         for (String query : userQueriesStrings) {
-            ParsedQuery parsedQuery = pipeline.run( new UserDefinedQuery(query) );
-            System.out.println(parsedQuery);
+            parseInput(query);
+            System.out.println("\n------------------------------\n");
         }
     }
 
