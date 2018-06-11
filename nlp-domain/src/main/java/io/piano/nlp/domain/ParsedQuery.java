@@ -108,14 +108,14 @@ public class ParsedQuery {
                 String lstStr = lst.toString()
                         .replace("[", "[\n\t\t")
                         .replace(", ", ",\n\t\t")
-                        .replace("]", "\t\n]");
+                        .replace("]", "\n\t]");
                 sb.append(lstStr);
             } else if (property.getClass() == ResultOperatorsDescriptor.class) {
                 ResultOperatorsDescriptor lst = (ResultOperatorsDescriptor) property;
                 String lstStr = lst.toString()
                         .replace("[", "[\n\t\t")
                         .replace(", ", ",\n\t\t")
-                        .replace("]", "\t\n]");
+                        .replace("]", "\n\t]");
                 sb.append(lstStr);
             } else {
                 sb.append(property);

@@ -57,7 +57,7 @@ public class TestMetricsParser extends BaseNLPTest {
                 of("AdBlock", WORD),
                 of("Whitelist", WORD)
         );
-        StateDomain expected5 = new StateDomain(MetricGroup.ADBLOCK, "adblock_whiltelisting");
+        StateDomain expected5 = new StateDomain(MetricGroup.ADBLOCK, "adblock_whitelisting");
 
         return new Object[][] {
                 {tokens1, expected1},

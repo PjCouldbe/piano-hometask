@@ -29,10 +29,18 @@ public class Launcher {
             while (input != null && ! (input.equals("exit")) ) {
                 if (input.equals("show demo")) {
                     demoData();
+                } else if (input.equals("help")) {
+                    System.out.println("How to use this small utility:\n" +
+                            "\t- type \"help\" to see readme instructions.\n" +
+                            "\t- type \"show demo\" for demo examples parsing from test-task." +
+                            "\t- type any other non-empty string for parsing desired input and viewing result." +
+                            "\t- type \"exit\" for closing utility.");
                 } else if ( ! input.isEmpty()) {
                     parseInput(input);
                     System.out.println("\n\n");
                 }
+
+                input = sc.nextLine();
             }
         }
     }

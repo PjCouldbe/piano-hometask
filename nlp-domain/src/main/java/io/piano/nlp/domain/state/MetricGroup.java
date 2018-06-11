@@ -21,7 +21,7 @@ public enum MetricGroup {
     ADBLOCK {
         @Override
         public String[] getConversionMetrics() {
-            return new String[] {"adblock_whiltelisting", "adblock_whiltelist_rate"};
+            return new String[] {"adblock_whitelisting", "adblock_whitelist_rate"};
         }
     };
 

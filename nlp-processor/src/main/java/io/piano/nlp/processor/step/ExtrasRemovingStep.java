@@ -38,6 +38,7 @@ public class ExtrasRemovingStep {
 
         //noinspection SimplifiableIfStatement
         if (posTag.startsWith("V") && ! posTag.equals("VBG") && ! text.endsWith("ed")
+                        && ! text.toLowerCase().contains("adblock")
                 || posTag.startsWith("PRP") || text.equals("between"))
         {
             return false;
