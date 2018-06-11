@@ -9,6 +9,7 @@ import static java.lang.Character.isUpperCase;
  *
  * Created by Dima on 03.06.2018.
  */
+@SuppressWarnings("WeakerAccess")
 public class TokenUtils {
     public boolean isAuxiliary(Token t) {
         final String posTag = t.getPOSTag();
@@ -16,7 +17,10 @@ public class TokenUtils {
     }
 
     public String normalizeText(Token t) {
-        String tokenText = t.getText();
+        return normalizeText(t.getText());
+    }
+
+    public String normalizeText(String tokenText) {
         return tokenText.replaceAll("e?s($|\")", "")
                 .replaceAll("ies($|\")", "y");
     }

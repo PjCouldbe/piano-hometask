@@ -33,7 +33,7 @@ import static java.util.Collections.singletonList;
 @RunWith(DataProviderRunner.class)
 public class TestParseQuery extends BaseNLPTest {
     private static final ParseQueryPipeline pipeline = ParseQueryPipeline.initialize();
-    private static final TimeRangeComparator TIME_RANGE_COMPARATOR = new TimeRangeComparator(2);
+    private static final TimeRangeComparator TIME_RANGE_COMPARATOR = new TimeRangeComparator(10);
     private static final Date now = new Date();
 
 
@@ -127,7 +127,7 @@ public class TestParseQuery extends BaseNLPTest {
                 .stateDomains( asList(new StateDomain(MetricGroup.CHURN, "churned_subscription")) )
                 .build();
             c.setTime(now);
-            c.add(Calendar.WEEK_OF_MONTH, -2);
+            c.add(Calendar.WEEK_OF_MONTH, -1);
             begin = c.getTime();
         expected10.setTimeRange( of(begin ,now) );
         oper = new ResultOperator(OperatorType.AGGREGATE);
@@ -138,6 +138,9 @@ public class TestParseQuery extends BaseNLPTest {
         ParsedQuery expected11 = ParsedQuery.builder()
                 .stateDomains( asList(new StateDomain(MetricGroup.CONVERSION, "conversion_rate")) )
                 .build();
+        oper = new ResultOperator(OperatorType.AGGREGATE);
+            oper.addValueFor("max", "operator");
+        expected11.addOperator(oper);
         oper = new ResultOperator(OperatorType.GROUP);
             oper.addValueFor("location", "groupQualifier");
             oper.addValueFor("city", "groupValue");
@@ -154,7 +157,7 @@ public class TestParseQuery extends BaseNLPTest {
                 ))
                 .build();
         oper = new ResultOperator(OperatorType.AGGREGATE);
-            oper.addValueFor("operator", "count");
+            oper.addValueFor("count", "operator");
         expected12.addOperator(oper);
             c.setTime(now);
             c.set(Calendar.MONTH, Calendar.JUNE);

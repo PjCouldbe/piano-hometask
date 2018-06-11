@@ -37,7 +37,7 @@ public class ExtrasRemovingStep {
         if (posTag == null) return true;
 
         //noinspection SimplifiableIfStatement
-        if (posTag.startsWith("V") && ! posTag.equals("VBG")
+        if (posTag.startsWith("V") && ! posTag.equals("VBG") && ! text.endsWith("ed")
                 || posTag.startsWith("PRP") || text.equals("between"))
         {
             return false;

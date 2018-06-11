@@ -23,7 +23,7 @@ public class ParsingStep {
     private BitSet markedTokens;
 
     public ParsedQuery parse(List<Token> tokens) {
-        ParsedQuery result = new ParsedQuery();
+        ParsedQuery result = ParsedQuery.builder().build();
         markedTokens = new BitSet( tokens.size() );
 
         detectUnambiguous(result, tokens);

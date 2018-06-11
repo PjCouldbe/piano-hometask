@@ -45,6 +45,8 @@ public class SynonymsResolvingStep {
         }
         if (resTokens.length > 1) {
             res.addAll( Arrays.asList(resTokens).subList(1, resTokens.length) );
+        } else {
+            res.add( tokens.get(tokens.size() - 1) );
         }
 
         return res;

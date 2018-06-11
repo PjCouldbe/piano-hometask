@@ -60,8 +60,18 @@ public class MetricsParser {
     }
 
     private String selectFinalMetric(List<Token> tokens, BitSet markedTokens, int index, String[] metrics) {
-        List<String> filteredMetrics = findMetrics(tokens.get(index), newArrayList(metrics));
-        if (filteredMetrics.size() == 1) return filteredMetrics.get(0);
+        List<String> filteredMetrics = findMetrics(tokens.get(index), markedTokens, index, newArrayList(metrics));
+        if (filteredMetrics.size() == 1) {
+            if (index - 1 >= 0 && tokenUtils.normalizeText(tokens.get(index - 1)).equals("subscription") ) {
+                markedTokens.set(index - 1, true);
+            }
+            if (index + 1 < tokens.size() && tokenUtils.normalizeText(tokens.get(index + 1)).equals("subscription") ) {
+                markedTokens.set(index + 1, true);
+            }
+            return filteredMetrics.get(0);
+        }
+
+        markedTokens.set(index, true);
 
         String metricFromRight = tryExpanse(tokens, markedTokens, index, 1, metrics);
         if ( ! isNullOrEmpty(metricFromRight) ) {
@@ -82,7 +92,7 @@ public class MetricsParser {
         for (int i = currIndex + step; (step > 0 ? i < tokens.size() : i >= 0); i += step) {
             if (markedTokens.get(i) == true) continue;
 
-            metricsList = findMetrics(tokens.get(i), metricsList);
+            metricsList = findMetrics(tokens.get(i), markedTokens, i, metricsList);
 
             if (metricsList.size() == 1) {
                 return metricsList.get(0);
@@ -93,7 +103,7 @@ public class MetricsParser {
         return metricsList.size() == metrics.length ? null : metricsList.get(0);
     }
 
-    private List<String> findMetrics(Token t, List<String> metricsList) {
+    private List<String> findMetrics(Token t, BitSet markedTokens, int index, List<String> metricsList) {
         final String word = tokenUtils.normalizeText(t);
 
         if (word.equals("subscription")) {
@@ -107,6 +117,7 @@ public class MetricsParser {
         if (metricsList.size() == 0) {
             return singletonList(firstMetricBackup);
         } else {
+            markedTokens.set(index, true);
             return metricsList;
         }
     }

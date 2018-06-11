@@ -29,7 +29,7 @@ import static java.util.Arrays.asList;
  */
 @RunWith(DataProviderRunner.class)
 public class TestTimeParser extends BaseNLPTest {
-    private static final TimeRangeComparator TIME_RANGE_COMPARATOR = new TimeRangeComparator();
+    private static final TimeRangeComparator TIME_RANGE_COMPARATOR = new TimeRangeComparator(10);
 
     @SuppressWarnings("ArraysAsListWithZeroOrOneArgument")
     @DataProvider

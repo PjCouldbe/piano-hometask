@@ -21,7 +21,7 @@ import static io.piano.nlp.shared.TokenType.*;
  */
 public class TestResolveSynonyms extends BaseNLPTest {
     @Test
-    public void testExtrasRemoving() {
+    public void testResolveSynonyms() {
         List<Token> tokens = Arrays.asList(
                 of("how", WORD),  of("many", WORD),
                 of("cancelled", WORD),  of("subscriptions", WORD),
@@ -37,7 +37,7 @@ public class TestResolveSynonyms extends BaseNLPTest {
 
         List<Token> expected = Arrays.asList(
                 of("<COUNT>", WORD),
-                of("churned", WORD),    of("subscriptions", WORD),
+                of("churned", WORD),    of("subscription", WORD),
                 of("1", NUMBER), of("site", WORD),
                 of("June", WORD),   of("1", NUMBER),
                 of("and", WORD),

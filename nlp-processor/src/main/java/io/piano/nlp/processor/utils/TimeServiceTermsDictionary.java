@@ -62,7 +62,7 @@ public class TimeServiceTermsDictionary {
             if (cat == NUMERIC) {
                 value = Integer.parseInt(ttext);
             } else if (cat == GENERAL) {
-                processPastGeneral(ttext, k, markedTokens, begin, end, value, addMod);
+                processPastGeneral(ttext, begin, end, value, addMod);
             } else if (cat == CONCRETE) {
                 processPastConcrete(ttext, k, dict, markedTokens, begin, end);
             } else {
@@ -71,10 +71,11 @@ public class TimeServiceTermsDictionary {
 
             markedTokens.set(k, true);
         }
+
+        markedTokens.set(concreteWordIndex, true);
     }
 
-    private void processPastGeneral(String ttext, int index, BitSet markedTokens,
-                                    TimeQuerySetting begin, TimeQuerySetting end,
+    private void processPastGeneral(String ttext, TimeQuerySetting begin, TimeQuerySetting end,
                                     Integer value, int addMod)
     {
         final int finalValue = ((value == null) ? -1 : -value) + addMod;

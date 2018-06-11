@@ -158,6 +158,7 @@ public class TimeParser {
 
             TimeConcreteModification concreteMod = getTimeEntryModifier( tokens.get(i) );
             applyTimeConcreteModification(concreteMod, begin, end);
+            markedTokens.set(i);
         }
     }
 

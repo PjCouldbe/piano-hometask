@@ -5,6 +5,7 @@ import io.piano.nlp.test.parsers.TestGeneralParser;
 import io.piano.nlp.test.parsers.TestMetricsParser;
 import io.piano.nlp.test.parsers.TestTimeParser;
 import io.piano.nlp.test.steps.TestExtrasRemoving;
+import io.piano.nlp.test.steps.TestParseQuery;
 import io.piano.nlp.test.steps.TestResolveSynonyms;
 import io.piano.nlp.test.steps.TestTokenization;
 import org.junit.runner.RunWith;
@@ -20,7 +21,7 @@ import org.junit.runners.Suite;
         TestTokenization.class,
         TestExtrasRemoving.class,
         TestResolveSynonyms.class,
-//        TestParseQuery.class,
+        TestParseQuery.class,
 
         TestTimeParser.class,
         TestMetricsParser.class,

@@ -1,5 +1,8 @@
 package io.piano.nlp.processor.utils;
 
+import org.tartarus.snowball.SnowballStemmer;
+import org.tartarus.snowball.ext.englishStemmer;
+
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -11,12 +14,15 @@ import java.util.stream.Collectors;
  * Created by Dima on 02.06.2018.
  */
 public class SynonymsResolver {
+    private static final TokenUtils tokenUtils = new TokenUtils();
+    private static final SnowballStemmer stemmer = new englishStemmer();
+
     private Map<String, String> synonymsDictionary = new HashMap<>(200);
 
     {
-        synonymsDictionary.put("location", "<LOCATION>");
-        synonymsDictionary.put("place",    "<LOCATION>");
-        synonymsDictionary.put("area",     "<LOCATION>");
+        synonymsDictionary.put("location", "location");
+        synonymsDictionary.put("place",    "location");
+        synonymsDictionary.put("area",     "location");
 
         synonymsDictionary.put("town", "city");
 
@@ -53,7 +59,17 @@ public class SynonymsResolver {
     }
 
     public String getDefaultWordBySynonym(String... words) {
-        String unioned = Arrays.stream(words).collect(Collectors.joining(" "));
+        String unioned = Arrays.stream(words)
+                .map(tokenUtils::normalizeText)
+                .map(w -> w.endsWith("ing") ? stem(w).toLowerCase() : w)
+                .collect(Collectors.joining(" "));
+
         return synonymsDictionary.getOrDefault(unioned, unioned);
+    }
+
+    private String stem(String word) {
+        stemmer.setCurrent(word);
+        stemmer.stem();
+        return stemmer.getCurrent();
     }
 }
